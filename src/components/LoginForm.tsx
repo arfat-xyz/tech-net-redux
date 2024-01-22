@@ -8,6 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { createUser, loginUser } from '@/redux/features/user/userApi';
+import { useNavigate } from 'react-router-dom';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -17,16 +20,23 @@ interface LoginFormInputs {
 }
 
 export function LoginForm({ className, ...props }: UserAuthFormProps) {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>();
-
+  const { user, isLoading } = useAppSelector((state) => state.user);
   const onSubmit = (data: LoginFormInputs) => {
-    console.log(data);
+    dispatch(loginUser({ email: data.email, password: data.password }));
+    navigate('/');
   };
-
+  if (isLoading) 'Loading...';
+  if (user?.email) {
+    navigate('/');
+  }
+  console.log(user?.email);
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <form onSubmit={handleSubmit(onSubmit)}>
